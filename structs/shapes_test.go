@@ -7,31 +7,27 @@ func TestPerimeter(t *testing.T) {
 	got := Perimeter(rectangle)
 	want := 40.0
 
-	checkAnswer(t, got, want)
 	if got != want {
 		t.Errorf("got %.2f want %.2f", got, want)
 	}
 }
 
 func TestArea(t *testing.T) {
+	checkArea := func(t testing.TB, shape Shape, want float64) {
+		t.Helper()
+		got := shape.Area()
+		if got != want {
+			t.Errorf("got %g want %g", got, want)
+		}
+	}
+
 	t.Run("rectangles", func(t *testing.T) {
 		rectangle := Rectangle{12.0, 6.0}
-		got := rectangle.Area()
-		want := 72.0
-		checkAnswer(t, got, want)
+		checkArea(t, rectangle, 72.0)
 	})
 
 	t.Run("circles", func(t *testing.T) {
 		circle := Circle{10.0}
-		got := circle.Area()
-		want := 314.1592653589793
-		checkAnswer(t, got, want)
+		checkArea(t, circle, 314.1592653589793)
 	})
-}
-
-func checkAnswer(t testing.TB, got, want float64) {
-	t.Helper()
-	if got != want {
-		t.Errorf("got %g want %g", got, want)
-	}
 }
