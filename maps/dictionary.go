@@ -40,6 +40,10 @@ func (d Dictionary) Add(word, definition string) error {
 	return nil
 }
 
+func (d Dictionary) Delete(word string) {
+	delete(d, word)
+}
+
 func (d Dictionary) Update(word, definition string) error {
 	_, err := d.Search(word)
 
