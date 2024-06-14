@@ -9,8 +9,8 @@ import (
 )
 
 type StubStore struct {
-	response string
-	cancled  bool
+	response  string
+	cancelled bool
 }
 
 func (s *StubStore) Fetch() string {
@@ -19,13 +19,32 @@ func (s *StubStore) Fetch() string {
 }
 
 func (s *StubStore) Cancel() {
-	s.cancled = true
+	s.cancelled = true
 }
 
 func TestServer(t *testing.T) {
+	t.Run("returns data from store", func(t *testing.T) {
+		data := "hello, world"
+		store := &StubStore{response: data}
+		svr := Server(store)
+
+		request := httptest.NewRequest(http.MethodGet, "/", nil)
+		response := httptest.NewRecorder()
+
+		svr.ServeHTTP(response, request)
+
+		if response.Body.String() != data {
+			t.Errorf(`got "%s", want "%s"`, response.Body.String(), data)
+		}
+
+		if store.cancelled {
+			t.Error("it should not have cancelled the store")
+		}
+	})
+
 	t.Run("tells store to cancel work if request is cancelled", func(t *testing.T) {
 		data := "hello, world"
-		store := &StubStore{response: data, cancled: false}
+		store := &StubStore{response: data, cancelled: false}
 		svr := Server(store)
 
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -39,7 +58,7 @@ func TestServer(t *testing.T) {
 
 		svr.ServeHTTP(response, request)
 
-		if !store.cancled {
+		if !store.cancelled {
 			t.Error("store was not told to cancel")
 		}
 	})
